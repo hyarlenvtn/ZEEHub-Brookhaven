@@ -1,0 +1,182 @@
+-- Execução única
+if _G.ZEEHub_Spectate_Loaded then return end
+_G.ZEEHub_Spectate_Loaded = true
+
+-- Checagem de jogo (Brookhaven ID)
+if game.PlaceId ~= 4924922222 then return end
+
+-- Delay de segurança
+task.wait(math.random(1, 2))
+
+-- Serviços principais
+local players = game:GetService("Players")
+local lp = players.LocalPlayer
+local camera = workspace.CurrentCamera
+local tweenService = game:GetService("TweenService")
+
+-- Criar GUI
+local gui = Instance.new("ScreenGui", lp:WaitForChild("PlayerGui"))
+gui.Name = "ZSpectate_" .. tostring(math.random(1000, 9999))
+gui.ResetOnSpawn = false
+
+-- Frame principal
+local menuFrame = Instance.new("Frame")
+menuFrame.Size = UDim2.new(0, 250, 0, 300)
+menuFrame.Position = UDim2.new(0.05, 0, 0.1, 0)
+menuFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+menuFrame.BorderSizePixel = 0
+menuFrame.Visible = false
+menuFrame.Active = true
+menuFrame.Draggable = true
+menuFrame.Parent = gui
+
+-- UIList para os elementos
+local uilist = Instance.new("UIListLayout", menuFrame)
+uilist.SortOrder = Enum.SortOrder.LayoutOrder
+uilist.Padding = UDim.new(0, 5)
+
+-- Scroll para lista longa
+local scroll = Instance.new("ScrollingFrame", menuFrame)
+scroll.Size = UDim2.new(1, 0, 1, -40)
+scroll.CanvasSize = UDim2.new(0, 0, 10, 0)
+scroll.ScrollBarThickness = 4
+scroll.BackgroundTransparency = 1
+scroll.BorderSizePixel = 0
+scroll.Name = "PlayerList"
+scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+scroll.ScrollingDirection = Enum.ScrollingDirection.Y
+
+local listLayout = Instance.new("UIListLayout", scroll)
+listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+listLayout.Padding = UDim.new(0, 5)
+
+-- Título
+local title = Instance.new("TextLabel", menuFrame)
+title.Size = UDim2.new(1, -40, 0, 30)
+title.Position = UDim2.new(0, 5, 0, 5)
+title.Text = "ZEE Spectate"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 22
+
+task.spawn(function()
+    while true do
+            local tween = tweenService:Create(title, TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
+                            TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+            })
+                    tween:Play()
+                            tween.Completed:Wait()
+                                end
+                                end)
+
+                                -- Botão de fechar
+                                local closeBtn = Instance.new("TextButton", menuFrame)
+                                closeBtn.Size = UDim2.new(0, 30, 0, 30)
+                                closeBtn.Position = UDim2.new(1, -35, 0, 5)
+                                closeBtn.Text = "✕"
+                                closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                                closeBtn.BackgroundColor3 = Color3.fromRGB(30, 0, 0)
+                                closeBtn.BorderSizePixel = 0
+                                closeBtn.Font = Enum.Font.SourceSansBold
+                                closeBtn.TextSize = 20
+                                closeBtn.MouseButton1Click:Connect(function()
+                                    menuFrame.Visible = false
+                                    end)
+
+                                    -- Botão de toggle
+                                    local toggleBtn = Instance.new("TextButton", gui)
+                                    toggleBtn.Size = UDim2.new(0, 40, 0, 40)
+                                    toggleBtn.Position = UDim2.new(0, 10, 1, -50)
+                                    toggleBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+                                    toggleBtn.Text = "-"
+                                    toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                                    toggleBtn.Font = Enum.Font.SourceSansBold
+                                    toggleBtn.TextSize = 24
+                                    toggleBtn.MouseButton1Click:Connect(function()
+                                        menuFrame.Visible = not menuFrame.Visible
+                                        end)
+
+                                        -- Função de espectar
+                                        local currentSpectating = nil
+                                        local function toggleSpectate(player)
+                                            if player and player.Character and player.Character:FindFirstChild("Humanoid") then
+                                                    camera.CameraSubject = player.Character.Humanoid
+                                                            currentSpectating = player
+                                                                else
+                                                                        if lp.Character and lp.Character:FindFirstChild("Humanoid") then
+                                                                                    camera.CameraSubject = lp.Character.Humanoid
+                                                                                            end
+                                                                                                    currentSpectating = nil
+                                                                                                        end
+                                                                                                        end
+
+                                                                                                        -- Atualizar lista de jogadores
+                                                                                                        local function updateList()
+                                                                                                            for _, v in pairs(scroll:GetChildren()) do
+                                                                                                                    if v:IsA("Frame") and v.Name == "PlayerItem" then
+                                                                                                                                v:Destroy()
+                                                                                                                                        end
+                                                                                                                                            end
+
+                                                                                                                                                for _, p in pairs(players:GetPlayers()) do
+                                                                                                                                                        if p ~= lp then
+                                                                                                                                                                    local playerFrame = Instance.new("Frame", scroll)
+                                                                                                                                                                                playerFrame.Name = "PlayerItem"
+                                                                                                                                                                                            playerFrame.Size = UDim2.new(1, -10, 0, 30)
+                                                                                                                                                                                                        playerFrame.BackgroundTransparency = 1
+
+                                                                                                                                                                                                                    local box = Instance.new("TextButton", playerFrame)
+                                                                                                                                                                                                                                box.Size = UDim2.new(0, 20, 0, 20)
+                                                                                                                                                                                                                                            box.Position = UDim2.new(0, 5, 0.5, -10)
+                                                                                                                                                                                                                                                        box.Text = ""
+                                                                                                                                                                                                                                                                    box.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                                                                                                                                                                                                                                                                                box.BorderColor3 = Color3.fromRGB(255, 255, 255)
+
+                                                                                                                                                                                                                                                                                            local name = Instance.new("TextLabel", playerFrame)
+                                                                                                                                                                                                                                                                                                        name.Size = UDim2.new(1, -30, 1, 0)
+                                                                                                                                                                                                                                                                                                                    name.Position = UDim2.new(0, 30, 0, 0)
+                                                                                                                                                                                                                                                                                                                                name.Text = p.Name
+                                                                                                                                                                                                                                                                                                                                            name.TextColor3 = Color3.fromRGB(255, 255, 255)
+                                                                                                                                                                                                                                                                                                                                                        name.BackgroundTransparency = 1
+                                                                                                                                                                                                                                                                                                                                                                    name.Font = Enum.Font.SourceSans
+                                                                                                                                                                                                                                                                                                                                                                                name.TextSize = 18
+                                                                                                                                                                                                                                                                                                                                                                                            name.TextXAlignment = Enum.TextXAlignment.Left
+
+                                                                                                                                                                                                                                                                                                                                                                                                        box.MouseButton1Click:Connect(function()
+                                                                                                                                                                                                                                                                                                                                                                                                                        if currentSpectating == p then
+                                                                                                                                                                                                                                                                                                                                                                                                                                            toggleSpectate(nil)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                box.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                else
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    toggleSpectate(p)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        for _, other in pairs(scroll:GetChildren()) do
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                if other:IsA("Frame") and other:FindFirstChild("TextButton") then
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            other.TextButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    end
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        end
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            box.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            end
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        end)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                end
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    end
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    end
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    players.PlayerAdded:Connect(updateList)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    players.PlayerRemoving:Connect(updateList)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    updateList()
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    -- Proteção anti-admin (anti-ban)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    players.PlayerAdded:Connect(function(player)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        local success, rank = pcall(function()
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                return player:GetRankInGroup(12345678)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    end)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        if success and rank and rank >= 200 then
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                lp:Kick("Desconectado: Detecção de moderador/admin.")
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    end
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    end)
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    --[ZEE Security System - Camadas de Proteção com Aparência Top]
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    -- Atualizado com proteção, UI aprimorada, efeitos visuais e controle total
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    -- Apenas o executor vê o menu, reforçando a segurança contra detecção
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+            }))
